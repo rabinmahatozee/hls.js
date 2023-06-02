@@ -68,7 +68,22 @@ class AudioTrackController extends BasePlaylistController {
     event: Events.MANIFEST_PARSED,
     data: ManifestParsedData
   ): void {
-    this.tracks = data.audioTracks || [];
+    // this.tracks = data.audioTracks || [];
+    if(!data?.audioTracks){
+      this.tracks = []
+      return;
+    }
+    const audioGroupId = data?.audioTracks?.[0]?.groupId 
+    if(audioGroupId && data?.audioTracks?.every(track=>track.groupId === audioGroupId)){
+      this.tracks = data?.audioTracks
+    } 
+    else {
+      this.tracks = data?.audioTracks?.map((track, index)=>{
+        track.groupId = audioGroupId;
+        track.id = index;
+        return track;
+      });
+    }
   }
 
   protected onAudioTrackLoaded(
